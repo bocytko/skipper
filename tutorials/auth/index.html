@@ -1316,8 +1316,8 @@ with the following arguments:</p>
     -oauth2-tokeninfo-url<span class="o">=</span>&lt;OAUTH2_TOKENINFO_ENDPOINT&gt; <span class="se">\</span>
     -oauth2-callback-path<span class="o">=</span>/oauth/callback
 </code></pre></div>
-<p>The <code>-oauth2-revoke-token-url</code> is optional, and must only be supplied if you plan
-on using the <a href="../../reference/filters/#grantlogout">grantLogout</a> filter.</p>
+<p>The <code>-oauth2-revoke-token-url</code> is optional, and should be supplied if you plan
+to use the <a href="../../reference/filters/#grantlogout">grantLogout</a> filter to revoke tokens.</p>
 <p>You can configure the <code>oauthGrant()</code> filter further for your needs. See the
 <a href="../../reference/filters/#oauthgrant">oauthGrant</a> filter reference for more details.</p>
 <h4 id="add-filters-to-your-routes">Add filters to your routes<a class="headerlink" href="#add-filters-to-your-routes" title="Permanent link">&para;</a></h4>
@@ -1326,7 +1326,8 @@ will be refused access and redirected to log in.</p>
 <p>Skipper will automatically add a callback route for you with the <code>grantCallback</code> filter registered 
 on it. The path for this route can be configured with the <code>-oauth2-callback-path</code> parameter.
 If the parameter is not given, it will be <code>/.well-known/oauth2-callback</code></p>
-<p>You can optionally add a <code>grantLogout()</code> filter for revoking access and refresh tokens:</p>
+<p>You can optionally add a <code>grantLogout()</code> filter to delete token cookie.
+If <code>-oauth2-revoke-token-url</code> is set it will revoke access and refresh tokens:</p>
 <div class="highlight"><pre><span></span><code>foo:
     Path(&quot;/foo&quot;)
     -&gt; oauthGrant()
@@ -1335,6 +1336,7 @@ If the parameter is not given, it will be <code>/.well-known/oauth2-callback</co
 logout:
     Path(&quot;/logout)
     -&gt; grantLogout()
+    -&gt; redirectTo(302)
     -&gt; &lt;shunt&gt;;
 </code></pre></div>
 <h4 id="optional-authz-and-access-control">(Optional) AuthZ and access control<a class="headerlink" href="#optional-authz-and-access-control" title="Permanent link">&para;</a></h4>

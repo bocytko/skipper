@@ -556,6 +556,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#repeatcontenthex" class="md-nav__link">
+    repeatContentHex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrapcontent" class="md-nav__link">
+    wrapContent
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrapcontenthex" class="md-nav__link">
+    wrapContentHex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#backendtimeout" class="md-nav__link">
     backendTimeout
   </a>
@@ -2361,6 +2382,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#repeatcontenthex" class="md-nav__link">
+    repeatContentHex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrapcontent" class="md-nav__link">
+    wrapContent
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrapcontenthex" class="md-nav__link">
+    wrapContentHex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#backendtimeout" class="md-nav__link">
     backendTimeout
   </a>
@@ -3683,7 +3725,7 @@ and will not override the value if the header exists already.</p>
 <code>access_token</code> query param with a prefix value <code>Bearer</code> and will
 not override the value if the header exists already.</p>
 <h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
-<p>These filters are meant for diagnostic or load testing  purposes</p>
+<p>These filters are meant for diagnostic or load testing purposes.</p>
 <h3 id="randomcontent">randomContent<a class="headerlink" href="#randomcontent" title="Permanent link">&para;</a></h3>
 <p>Generate response with random text of specified length.</p>
 <p>Parameters:</p>
@@ -3703,6 +3745,53 @@ not override the value if the header exists already.</p>
 <p>Example:</p>
 <div class="highlight"><pre><span></span><code>* -&gt; repeatContent(&quot;I will not waste chalk. &quot;, 1000) -&gt; &lt;shunt&gt;;
 </code></pre></div>
+<h3 id="repeatcontenthex">repeatContentHex<a class="headerlink" href="#repeatcontenthex" title="Permanent link">&para;</a></h3>
+<p>Generate response of specified size from repeated bytes.</p>
+<p>Parameters:</p>
+<ul>
+<li>bytes to repeat (hexadecimal string)</li>
+<li>size of response in bytes (int)</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>* -&gt; repeatContentHex(&quot;00&quot;, 100) -&gt; &lt;shunt&gt;
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>// Create binary response using size equal to the number of bytes to repeat, i.e. repeat once
+* -&gt; repeatContentHex(&quot;68657861646563696d616c&quot;, 11) -&gt; &lt;shunt&gt;
+</code></pre></div>
+<h3 id="wrapcontent">wrapContent<a class="headerlink" href="#wrapcontent" title="Permanent link">&para;</a></h3>
+<p>Add prefix and suffix to the response.</p>
+<p>Parameters:</p>
+<ul>
+<li>prefix (string)</li>
+<li>suffix (string)</li>
+</ul>
+<p>Examples:</p>
+<div class="highlight"><pre><span></span><code>* -&gt; wrapContent(&quot;foo&quot;, &quot;baz&quot;) -&gt; inlineContent(&quot;bar&quot;) -&gt; &lt;shunt&gt;
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>// JSON array of 100 zeros
+* -&gt; wrapContent(&quot;[&quot;, &quot;0]&quot;) -&gt; repeatContent(&quot;0, &quot;, 297) -&gt; &lt;shunt&gt;
+</code></pre></div>
+<h3 id="wrapcontenthex">wrapContentHex<a class="headerlink" href="#wrapcontenthex" title="Permanent link">&para;</a></h3>
+<p>Add prefix and suffix to the response.</p>
+<p>Parameters:</p>
+<ul>
+<li>prefix (hexadecimal string)</li>
+<li>suffix (hexadecimal string)</li>
+</ul>
+<p>Examples:</p>
+<div class="highlight"><pre><span></span><code>* -&gt; wrapContentHex(&quot;68657861&quot;, &quot;6d616c&quot;) -&gt; inlineContent(&quot;deci&quot;) -&gt; &lt;shunt&gt;
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>// 1G of gzip-compressed text
+*
+-&gt; setResponseHeader(&quot;Content-Encoding&quot;, &quot;gzip&quot;)
+-&gt; wrapContentHex(
+  &quot;1f8b08000000000004ffecd6b10d00200804c05598c5b80a852d0ee422762ce61c2657d212f8bf9915bb6f9f8c51b9c26c1feec13fc80379a80ff4210ff0000ff0000ff0000ff0000ff0000ff0000ff0000ff0000ff0000ff0000ff0000ffce781070000ffffecd6810c000000c0207feb737c8ba2f8cd6f7ef39bdffce637bf&quot;,
+  &quot;7dc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077ce0ff81000000ffffecd6810000000080207feb418ea278ce739ef39ce73ce739cf7de0f581000000ffff010000ffff5216994600ca9a3b&quot;
+)
+-&gt; repeatContentHex(&quot;7dc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077cc0077ce0ff81000000ffffecd6810c000000c0207feb737c8ba278ce739ef39ce73ce739cf&quot;, 8300624)
+-&gt; &lt;shunt&gt;
+</code></pre></div>
+<p>You may use <a href="https://github.com/AlexanderYastrebov/unrepeat">https://github.com/AlexanderYastrebov/unrepeat</a> to decompose binary file into prefix, repeating content and suffix.</p>
 <h3 id="backendtimeout">backendTimeout<a class="headerlink" href="#backendtimeout" title="Permanent link">&para;</a></h3>
 <p>Configure backend timeout. Skipper responds with <code>504 Gateway Timeout</code> status if obtaining a connection,
 sending the request, and reading the backend response headers and body takes longer than the configured timeout.
@@ -4447,8 +4536,9 @@ callback:
 </table>
 <h4 id="grantlogout">grantLogout<a class="headerlink" href="#grantlogout" title="Permanent link">&para;</a></h4>
 <p>The filter revokes the refresh and access tokens in the cookie set by
-<a href="#oauthgrant">oauthGrant</a>. It also deletes the cookie by setting the <code>Set-Cookie</code>
-response header to an empty value after a successful token revocation.</p>
+<a href="#oauthgrant">oauthGrant</a> if <code>-oauth2-revoke-token-url</code> is configured.
+It also deletes the cookie by setting the <code>Set-Cookie</code> response header
+to an empty value after a successful token revocation.</p>
 <p>Examples:</p>
 <div class="highlight"><pre><span></span><code>grantLogout()
 </code></pre></div>
@@ -4464,7 +4554,7 @@ response header to an empty value after a successful token revocation.</p>
 <tbody>
 <tr>
 <td><code>-oauth2-revoke-token-url</code></td>
-<td><strong>yes</strong></td>
+<td>no</td>
 <td>URL of the OAuth2 provider&rsquo;s token revocation endpoint. Example: <code>-oauth2-revoke-token-url=https://identity.example.com/oauth2/revoke</code></td>
 </tr>
 </tbody>
@@ -5177,12 +5267,12 @@ flag in order to get those metrics.</p>
 <h4 id="endpoint-related-metrics">Endpoint Related Metrics<a class="headerlink" href="#endpoint-related-metrics" title="Permanent link">&para;</a></h4>
 <p>Those metrics are not identifying the realm and client. They always have <code>*</code> in their place.</p>
 <p>Example:</p>
-<div class="highlight"><pre><span></span><code>                                                                                     + Realm
-                                                                                     |
+<div class="highlight"><pre><span></span><code>                                                                                      + Realm
+                                                                                      |
 apiUsageMonitoring.custom.orders-backend.staging.orders-api.GET.foo/orders/{order-id}.*.*.http_count
-                                                                                       | |
-                                                                                       | + Metric Name
-                                                                                       + Client
+                                                                                        | |
+                                                                                        | + Metric Name
+                                                                                        + Client
 </code></pre></div>
 <p>The available metrics are:</p>
 <table>

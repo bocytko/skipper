@@ -1919,6 +1919,16 @@ are exposed from skipper to the metrics endpoint, default listener
 
 <p>}</p>
 <h3 id="redis-rate-limiting-metrics">Redis - Rate limiting metrics<a class="headerlink" href="#redis-rate-limiting-metrics" title="Permanent link">&para;</a></h3>
+<p>System metrics exposed by the redisclient:</p>
+<ul>
+<li>skipper.swarm.redis.shards: known Redis shards to the skipper ringclient</li>
+<li>skipper.swarm.redis.hits: number of times free connection was found in the pool</li>
+<li>skipper.swarm.redis.misses: number of times free connection was NOT found in the pool</li>
+<li>skipper.swarm.redis.timeouts: number of times a wait timeout occurred</li>
+<li>skipper.swarm.redis.staleconns: number of stale connections removed from the pool</li>
+<li>skipper.swarm.redis.idleconns: number of idle connections in the pool</li>
+<li>skipper.swarm.redis.totalconns: number of total connections in the pool</li>
+</ul>
 <p>Timer metrics for the latencies and errors of the communication with the auxiliary Redis instances are enabled
 by the default, and exposed among the timers via the following keys:</p>
 <ul>

@@ -1072,9 +1072,30 @@ and your dataclient in use.</p>
 <h3 id="redis-based-cluster-ratelimits">Redis based Cluster Ratelimits<a class="headerlink" href="#redis-based-cluster-ratelimits" title="Permanent link">&para;</a></h3>
 <p>This solution is independent of the dataclient being used.  You have
 to run N number of <a href="https://redis.io">Redis</a> instances, where N is &gt;
-0.  Specify <code>-swarm-redis-urls</code>, multiple instances can be separated
-by <code>,</code>, for example: <code>-swarm-redis-urls=redis1:6379,redis2:6379</code>. For
-running skipper in Kubernetes with this, see also <a href="../../kubernetes/ingress-controller/#redis-based">Running with
+0.</p>
+<p>There are 2 different configurations to assign redis instances as a skipper redis swarm.</p>
+<ul>
+<li>
+<p>Static:</p>
+<ul>
+<li>Specify <code>-swarm-redis-urls</code>, multiple instances can be separated
+by <code>,</code>, for example: <code>-swarm-redis-urls=redis1:6379,redis2:6379</code>. Use this if you don&rsquo;t need to scale your redis instances. </li>
+</ul>
+</li>
+<li>
+<p>Kubernetes Service Selector:</p>
+<ul>
+<li>Specify <code>-kubernetes-redis-service-namespace=default</code> and <code>-kubernetes-redis-service-name=redis</code>, this will create kubernetes dataclient which will take care of collecting redis instances endpoints. This will allow you to scale redis instances as much as you want.</li>
+</ul>
+</li>
+<li>
+<p>HTTP Endpoint</p>
+<ul>
+<li>Specify <code>-swarm-redis-remote=http://127.0.0.1/redis/endpoints</code>, this will make skipper pull endpoints from this remote URL and work with them.</li>
+</ul>
+</li>
+</ul>
+<p>see also <a href="../../kubernetes/ingress-controller/#redis-based">Running with
 Redis based Cluster Ratelimits</a></p>
 <p>The implementation use <a href="https://godoc.org/github.com/go-redis/redis#Ring">redis ring</a>
 to be able to shard via client hashing and spread the load across

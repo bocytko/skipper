@@ -348,6 +348,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#enable-and-disable-lua-sources" class="md-nav__link">
+    Enable and Disable lua sources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#available-lua-modules" class="md-nav__link">
     Available lua modules
   </a>
@@ -860,6 +867,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#enable-and-disable-lua-sources" class="md-nav__link">
+    Enable and Disable lua sources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#available-lua-modules" class="md-nav__link">
     Available lua modules
   </a>
@@ -934,6 +948,16 @@ in the route as table like
 <p>Lua <code>print</code> builtin function writes skipper info log messages.</p>
 <h2 id="sleep">sleep<a class="headerlink" href="#sleep" title="Permanent link">&para;</a></h2>
 <p><code>sleep(number)</code> function pauses execution for at least <code>number</code> milliseconds. A negative or zero duration causes <code>sleep</code> to return immediately.</p>
+<h2 id="enable-and-disable-lua-sources">Enable and Disable lua sources<a class="headerlink" href="#enable-and-disable-lua-sources" title="Permanent link">&para;</a></h2>
+<p>The flag <code>-lua-sources</code> allows to set 5 different values:</p>
+<ul>
+<li>&ldquo;file&rdquo;: Allows to use reference to file for scripts</li>
+<li>&ldquo;inline&rdquo;: Allows to use inline scripts</li>
+<li>&ldquo;inline&rdquo;, &ldquo;file&rdquo;: Allows to use reference to file and inline scripts</li>
+<li>&ldquo;none&rdquo;: Disable Lua filters</li>
+<li>&rdquo;&ldquo;: the same as &ldquo;inline&rdquo;, &ldquo;file&rdquo;, the default value for binary and
+  library users</li>
+</ul>
 <h2 id="available-lua-modules">Available lua modules<a class="headerlink" href="#available-lua-modules" title="Permanent link">&para;</a></h2>
 <p>Besides the <a href="https://www.lua.org/manual/5.1/manual.html#5">standard modules</a> - except
 for <code>debug</code> - the following additional modules have been preloaded and can be used with e.g.

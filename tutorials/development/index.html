@@ -806,6 +806,26 @@
     Filters
   </a>
   
+    <nav class="md-nav" aria-label="Filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filters-with-cleanup" class="md-nav__link">
+    Filters with cleanup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters-with-error-handling" class="md-nav__link">
+    Filters with error handling
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -930,6 +950,26 @@
   <a href="#filters" class="md-nav__link">
     Filters
   </a>
+  
+    <nav class="md-nav" aria-label="Filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filters-with-cleanup" class="md-nav__link">
+    Filters with cleanup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters-with-error-handling" class="md-nav__link">
+    Filters with error handling
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1088,6 +1128,75 @@ interface <code>Request(filters.FilterContext)</code> and <code>Response(filters
 <span class="p">}</span>
 </code></pre></div>
 <p>Find a detailed example at <a href="../../reference/development/#how-to-develop-a-filter">how to develop a filter</a>.</p>
+<h3 id="filters-with-cleanup">Filters with cleanup<a class="headerlink" href="#filters-with-cleanup" title="Permanent link">&para;</a></h3>
+<p>Sometimes your filter needs to cleanup resources on shutdown. In Go
+functions that do this have often the name <code>Close()</code>.
+There is the <code>filters.FilterCloser</code> interface that if you comply with
+it, the routing.Route will make sure your filters are closed in case
+of <code>routing.Routing</code> was closed.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span> <span class="nx">myFilter</span> <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="nx">NewMyFilter</span><span class="p">()</span> <span class="nx">filters</span><span class="p">.</span><span class="nx">Spec</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">myFilter</span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">spec</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">Name</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span> <span class="k">return</span> <span class="s">&quot;myFilter&quot;</span> <span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">spec</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">CreateFilter</span><span class="p">(</span><span class="nx">config</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{})</span> <span class="p">(</span><span class="nx">filters</span><span class="p">.</span><span class="nx">Filter</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">return</span> <span class="nx">NewMyFilter</span><span class="p">(),</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">Request</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">filters</span><span class="p">.</span><span class="nx">FilterContext</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// change data in ctx.Request() for example</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">Response</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">filters</span><span class="p">.</span><span class="nx">FilterContext</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// change data in ctx.Response() for example</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">Close</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+     <span class="c1">// cleanup your filter</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="filters-with-error-handling">Filters with error handling<a class="headerlink" href="#filters-with-error-handling" title="Permanent link">&para;</a></h3>
+<p>Sometimes you want to have a filter that wants to get called
+<code>Response()</code> even if the proxy will not send a response from the
+backend, for example you want to count error status codes, like
+the <a href="../../reference/filters/#admissioncontrol">admissionControl</a>
+filter.
+In this case you need to comply with the following proxy interface:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// errorHandlerFilter is an opt-in for filters to get called</span>
+<span class="c1">// Response(ctx) in case of errors.</span>
+<span class="kd">type</span> <span class="nx">errorHandlerFilter</span> <span class="kd">interface</span> <span class="p">{</span>
+    <span class="c1">// HandleErrorResponse returns true in case a filter wants to get called</span>
+    <span class="nx">HandleErrorResponse</span><span class="p">()</span> <span class="kt">bool</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Example:
+<div class="highlight"><pre><span></span><code><span class="kd">type</span> <span class="nx">myFilter</span> <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="nx">NewMyFilter</span><span class="p">()</span> <span class="nx">filters</span><span class="p">.</span><span class="nx">Spec</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">myFilter</span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">spec</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">Name</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span> <span class="k">return</span> <span class="s">&quot;myFilter&quot;</span> <span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">spec</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">CreateFilter</span><span class="p">(</span><span class="nx">config</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{})</span> <span class="p">(</span><span class="nx">filters</span><span class="p">.</span><span class="nx">Filter</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">return</span> <span class="nx">NewMyFilter</span><span class="p">(),</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">Request</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">filters</span><span class="p">.</span><span class="nx">FilterContext</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// change data in ctx.Request() for example</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">Response</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">filters</span><span class="p">.</span><span class="nx">FilterContext</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// change data in ctx.Response() for example</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">myFilter</span><span class="p">)</span> <span class="nx">HandleErrorResponse</span><span class="p">()</span> <span class="nb">bool</span><span class="p">()</span> <span class="p">{</span>
+     <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div></p>
 <h2 id="predicates">Predicates<a class="headerlink" href="#predicates" title="Permanent link">&para;</a></h2>
 <p>Predicates allow to match a condition, that can be based on arbitrary
 HTTP data in the Request. There are also predicates, that use a chance
